@@ -1,6 +1,6 @@
 {
     "id": "6cdbdc8d-3d15-4c8d-bb8d-efe0e9943906",
-    "version": "1.0.2",
+    "version": "1.0.0",
     "platform": "all",
     "arch": "all",
     "name": "stable-diffusion-png-extractor",
