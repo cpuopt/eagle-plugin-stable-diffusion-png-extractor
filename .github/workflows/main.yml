@@ -29,10 +29,10 @@ jobs:
               run: npm run build
 
             - name: Generate compressed package
-              run: zip -r stable-diffusion-png-extractor-${{ github.sha }}.eagleplugin ./dist/*
+              run: cd ./dist && zip -r stable-diffusion-png-extractor.eagleplugin *
 
             - name: Upload build artifacts
               uses: actions/upload-artifact@v4
               with:
                 name: stable-diffusion-png-extractor-${{ github.sha }}
-                path: ./stable-diffusion-png-extractor-${{ github.sha }}.eagleplugin
+                path: ./stable-diffusion-png-extractor.eagleplugin
