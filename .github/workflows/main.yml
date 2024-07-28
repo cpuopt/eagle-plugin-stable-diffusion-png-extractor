@@ -17,7 +17,7 @@ jobs:
     steps:
       - run: gh release delete nightly --cleanup-tag -y -R ${{ github.repository }}
 
-      - run: gh release create nightly -p -t "Nightly Release" -R ${{ github.repository }}
+      - run: gh release create nightly --latest -t "Nightly Release" -R ${{ github.repository }}
 
   build-and-upload-release:
     needs: reset-release
