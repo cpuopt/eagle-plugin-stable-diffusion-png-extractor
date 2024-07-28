@@ -1,9 +1,8 @@
 name: Build & Release eagle plugin CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+
 env:
   GH_TOKEN: ${{ github.token }}
 
