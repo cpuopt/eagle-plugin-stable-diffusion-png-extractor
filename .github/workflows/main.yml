@@ -1,38 +1,58 @@
-name: Build eagle plugin CI/CD Pipeline
+name: Build & Release eagle plugin CI/CD Pipeline
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+env:
+  GH_TOKEN: ${{ github.token }}
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  reset-release:
+    runs-on: ubuntu-latest
 
-        strategy:
-            matrix:
-                node-version: [20.x]
+    permissions:
+      contents: write
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - run: gh release delete nightly --cleanup-tag -y -R ${{ github.repository }}
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ matrix.node-version }}
+      - run: gh release create nightly -p -t "Nightly Release" -R ${{ github.repository }}
 
-            - name: Install dependencies
-              run: npm install
+  build-and-upload-release:
+    needs: reset-release
+    runs-on: ubuntu-latest
 
-            - name: Build project
-              run: npm run build
+    permissions:
+      contents: write
 
-            - name: Generate compressed package
-              run: cd ./dist && zip -r stable-diffusion-png-extractor.eagleplugin * && cd ..
+    strategy:
+      matrix:
+        node-version: [20.x]
 
-            - name: Upload build artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                name: stable-diffusion-png-extractor-${{ github.sha }}
-                path: ./dist/stable-diffusion-png-extractor.eagleplugin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Generate compressed package
+        run: cd ./dist && zip -r stable-diffusion-png-extractor.eagleplugin * && cd ..
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-diffusion-png-extractor-${{ github.sha }}
+          path: ./dist/stable-diffusion-png-extractor.eagleplugin
+
+      - name: Release eagle plugin
+        run: gh release upload nightly ./dist/stable-diffusion-png-extractor.eagleplugin -R ${{ github.repository }}
